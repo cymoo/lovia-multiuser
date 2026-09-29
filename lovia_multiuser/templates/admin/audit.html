@@ -1,0 +1,15 @@
+{% extends "admin/_base.html" %}
+{% from "admin/_macros.html" import audit_table %}
+{% set active = "audit" %}
+{% block title %}审计{% endblock %}
+{% block main %}
+<form class="toolbar" action="/admin/audit">
+  <input name="actor" value="{{ actor }}" placeholder="操作者 id" aria-label="操作者" />
+  <input name="owner" value="{{ owner }}" placeholder="对象用户 id" aria-label="对象用户" />
+  <button class="btn primary" type="submit">筛选</button>
+  {% if actor or owner %}<a class="btn" href="/admin/audit">清除</a>{% endif %}
+</form>
+<h1>审计记录 <span class="muted">最近 {{ entries|length }} 条</span></h1>
+<p class="muted">记录进入他人空间的每个请求（管理员查看、被拒绝的写操作、越权访问），以及账号的停用和启用。</p>
+{{ audit_table(entries) }}
+{% endblock %}

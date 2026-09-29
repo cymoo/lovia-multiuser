@@ -1,0 +1,44 @@
+{#- Overrides lovia's chat page for every user's app (ChatUI(templates=...)).
+    The dispatcher puts the signed-in `viewer` and the space's `owner` on
+    request.state; they differ only when an admin views someone else. -#}
+{% extends "lovia/index.html" %}
+
+{% block head %}
+<style>
+  .lmu-account { flex-shrink: 0; border-top: 1px solid var(--border); padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .lmu-account form { margin: 0; }
+  .lmu-who { display: flex; align-items: center; gap: 10px; padding: 6px 10px; font-size: 13px; color: var(--muted); min-width: 0; }
+  .lmu-who span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lmu-avatar { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; background: var(--accent-soft); color: var(--accent-text); font-weight: 700; font-size: 12px; }
+  .lmu-account .sidebar-nav-item { width: 100%; border: 0; background: none; font: inherit; font-size: 14px; cursor: pointer; text-align: left; text-decoration: none; }
+  .lmu-readonly {
+    position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 40;
+    max-width: calc(100vw - 32px); padding: 8px 16px; border-radius: 999px; font-size: 13px;
+    background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn-border); box-shadow: var(--shadow-sm);
+  }
+  .lmu-readonly a { color: inherit; font-weight: 600; }
+  {% if request.state.viewer.id != request.state.owner.id %}
+  /* Read-only: an admin's writes are refused (403) anyway — don't offer them. */
+  #composer { display: none !important; }
+  {% endif %}
+</style>
+{% endblock %}
+
+{% block sidebar_footer %}
+{% set viewer = request.state.viewer %}
+<div class="lmu-account">
+  <div class="lmu-who"><span class="lmu-avatar">{{ viewer.name[:1] | upper }}</span><span>{{ viewer.name }}</span></div>
+  {% if viewer.admin %}<a class="sidebar-nav-item" href="/admin">管理后台</a>{% endif %}
+  <form method="post" action="/logout"><button class="sidebar-nav-item" type="submit">退出登录</button></form>
+</div>
+{% endblock %}
+
+{% block body_end %}
+{% set viewer, owner = request.state.viewer, request.state.owner %}
+{% if viewer.id != owner.id %}
+<div class="lmu-readonly" role="status">
+  只读查看 <b>{{ owner.name }}</b>（{{ owner.id }}）的记录{% if owner.disabled %} · 账号已停用{% endif %}
+  · <a href="/admin/users/{{ owner.id }}">返回管理后台</a>
+</div>
+{% endif %}
+{% endblock %}

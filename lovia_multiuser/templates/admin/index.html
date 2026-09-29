@@ -1,0 +1,41 @@
+{% extends "admin/_base.html" %}
+{% from "admin/_macros.html" import status_tag, chat_link %}
+{% set active = "users" %}
+{% block title %}用户{% endblock %}
+{% block main %}
+<form class="toolbar" action="/admin/search">
+  <input name="q" placeholder="搜索所有用户的对话（标题或 id）" aria-label="搜索对话" />
+  <button class="btn primary" type="submit">搜索</button>
+</form>
+
+<h1>用户 <span class="muted">{{ rows|length }}</span></h1>
+<div class="card">
+  <table>
+    <tr><th>用户</th><th>状态</th><th>对话</th><th class="hide-sm">最近活动</th><th></th></tr>
+    {% for r in rows %}
+    <tr>
+      <td><a href="/admin/users/{{ r.user.id }}"><b>{{ r.user.name }}</b></a> <span class="mono muted">{{ r.user.id }}</span></td>
+      <td>{{ status_tag(r.user) }}</td>
+      <td>{{ r.chats }}{% if r.chats >= per_user %}+{% endif %}</td>
+      <td class="hide-sm muted">{{ r.last_active|ts }}</td>
+      <td class="right"><a class="btn" href="/u/{{ r.user.id }}/">查看对话</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+
+<h2>最近活跃的对话</h2>
+<div class="card">
+  {% if recent %}
+  <table>
+    {% for h in recent %}
+    <tr>
+      <td>{{ chat_link(h.user, h.chat) }}</td>
+      <td class="muted"><a href="/admin/users/{{ h.user.id }}">{{ h.user.name }}</a></td>
+      <td class="muted right">{{ h.chat.updated_at|ts }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}<div class="empty">还没有对话</div>{% endif %}
+</div>
+{% endblock %}

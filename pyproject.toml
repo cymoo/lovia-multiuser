@@ -1,0 +1,40 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "lovia-multiuser"
+version = "0.1.0"
+description = "Multi-user serving for lovia agents: one app per user, admin read-only access, audit log."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "lovia[web]>=0.9.75",
+    "uvicorn>=0.30",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "ruff>=0.6",
+]
+
+[project.scripts]
+lovia-multiuser = "lovia_multiuser.__main__:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["lovia_multiuser"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI declares dependencies and form fields as argument defaults.
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Form"]

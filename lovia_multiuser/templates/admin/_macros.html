@@ -1,0 +1,32 @@
+{% macro status_tag(user) -%}
+  {% if user.disabled %}<span class="tag off">已停用</span>{% else %}<span class="tag">正常</span>{% endif %}
+  {%- if user.admin %} <span class="tag admin">管理员</span>{% endif %}
+{%- endmacro %}
+
+{% macro chat_link(user, chat) -%}
+  <a href="/u/{{ user.id }}/?session={{ chat.id }}">{{ chat.title or "（无标题）" }}</a>
+{%- endmacro %}
+
+{% macro audit_table(entries) -%}
+<div class="card">
+  {% if entries %}
+  <table>
+    <tr><th>时间</th><th>操作者</th><th>对象用户</th><th>动作</th><th class="hide-sm">详情</th><th>结果</th></tr>
+    {% for e in entries %}
+    <tr>
+      <td class="muted">{{ e.ts|ts }}</td>
+      <td><a href="/admin/audit?actor={{ e.actor }}">{{ e.actor }}</a></td>
+      <td>{% if e.owner %}<a href="/admin/audit?owner={{ e.owner }}">{{ e.owner }}</a>{% endif %}</td>
+      <td>{{ {"http": "访问", "user.disable": "停用账号", "user.enable": "启用账号"}.get(e.action, e.action) }}</td>
+      <td class="hide-sm mono clip" title="{{ e.detail }}">{{ e.detail }}</td>
+      <td>
+        {%- if e.status is none %}—
+        {%- elif e.status < 400 %}<span class="tag">{{ e.status }}</span>
+        {%- else %}<span class="tag bad">{{ e.status }}</span>{% endif -%}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}<div class="empty">没有审计记录</div>{% endif %}
+</div>
+{%- endmacro %}

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}管理后台{% endblock %} · lovia</title>
+  <style>
+    /* Palette mirrors lovia's chat UI so the two read as one product. */
+    :root {
+      --bg: #f7f8fa; --surface: #fff; --border: #e4e7ec; --ink: #16181d;
+      --muted: #6b7280; --accent: #2d8a6e; --accent-soft: #e7f3ee;
+      --danger: #c2483a; --danger-soft: #fbeeec; --warn: #b06413; --warn-soft: #fbf3e6;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0d0e12; --surface: #16181d; --border: #2a2e37; --ink: #e8eaee;
+        --muted: #9aa1ad; --accent: #4fb393; --accent-soft: #15302a;
+        --danger: #e57366; --danger-soft: #33201d; --warn: #e0a55a; --warn-soft: #2e2416;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--ink);
+      font: 14px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Microsoft YaHei", sans-serif;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    header { background: var(--surface); border-bottom: 1px solid var(--border); }
+    .bar {
+      max-width: 1080px; margin: 0 auto; padding: 0 20px; height: 56px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .brand { font-weight: 700; white-space: nowrap; }
+    nav { display: flex; gap: 2px; flex: 1; }
+    nav a { color: var(--muted); padding: 6px 10px; border-radius: 8px; white-space: nowrap; }
+    nav a.on, nav a:hover { color: var(--ink); background: var(--bg); text-decoration: none; }
+    main { max-width: 1080px; margin: 0 auto; padding: 24px 20px 48px; }
+    h1 { font-size: 20px; margin: 0 0 12px; }
+    h2 { font-size: 15px; margin: 28px 0 10px; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    th { color: var(--muted); font-weight: 500; font-size: 12px; white-space: nowrap; }
+    tr:last-child td { border-bottom: 0; }
+    .muted { color: var(--muted); }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+    .right { text-align: right; white-space: nowrap; }
+    .tag { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; background: var(--bg); color: var(--muted); }
+    .tag.admin { background: var(--accent-soft); color: var(--accent); }
+    .tag.off, .tag.bad { background: var(--danger-soft); color: var(--danger); }
+    .tag.warn { background: var(--warn-soft); color: var(--warn); }
+    .btn {
+      display: inline-block; border: 1px solid var(--border); background: var(--surface); color: var(--ink);
+      padding: 5px 12px; border-radius: 8px; font: inherit; cursor: pointer;
+    }
+    .btn:hover { border-color: var(--muted); text-decoration: none; }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn.danger { color: var(--danger); }
+    form.inline { display: inline; margin: 0; }
+    .toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 0 0 20px; }
+    .toolbar input {
+      flex: 1; min-width: 160px; padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px;
+      background: var(--surface); color: var(--ink); font: inherit;
+    }
+    .empty { padding: 28px; text-align: center; color: var(--muted); }
+    .meta { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 0 0 16px; }
+    .clip { max-width: 420px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    @media (max-width: 640px) {
+      .hide-sm { display: none; }
+      th, td { padding: 8px 10px; }
+      .bar { gap: 8px; padding: 0 12px; }
+      main { padding: 16px 12px 40px; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <span class="brand">lovia <span class="hide-sm">管理后台</span></span>
+    <nav>
+      <a href="/admin" class="{{ 'on' if active == 'users' }}">用户</a>
+      <a href="/admin/search" class="{{ 'on' if active == 'search' }}">搜索</a>
+      <a href="/admin/audit" class="{{ 'on' if active == 'audit' }}">审计</a>
+    </nav>
+    <a href="/u/{{ viewer.id }}/" class="hide-sm">我的对话</a>
+    <form method="post" action="/logout" class="inline"><button class="btn" type="submit">退出</button></form>
+  </div>
+</header>
+<main>{% block main %}{% endblock %}</main>
+</body>
+</html>
