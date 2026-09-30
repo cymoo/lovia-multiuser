@@ -1,24 +1,6 @@
 # 使用指南
 
-## 快速体验
-
-不需要模型 API key：
-
-```bash
-python examples/demo.py
-```
-
-打开 <http://127.0.0.1:8000>，用 `alice` / `bob` / `admin` 登录，密码都是 `demo-password`。每条消息都会收到固定回复，可以点一遍登录、隔离、管理员只读查看、审计和停用。
-
-## 接入真实模型
-
-```bash
-lovia-multiuser users add admin --name 管理员 --admin   # 交互式输入密码
-lovia-multiuser users add alice --name Alice
-LOVIA_MODEL=... python examples/serve.py
-```
-
-模型配置见 lovia 的 `model_from_env`。`examples/serve.py` 给每个用户一个 `readonly` 工作区和独立的 Memory。
+安装、配置模型、创建账号、启动、日常使用和部署见 [README](../README.md)。本文是进阶参考。
 
 ## 编写 agent_factory
 
@@ -37,8 +19,9 @@ def agents(user: User, home: Path) -> Agent:
 
 - 工作区和 Memory 放在 `home` 下。
 - 工作区只用 `readonly` 或不用；`coding` / `trusted` 会让用户读到其他人的数据（见设计方案"安全边界"）。
-- 需要以用户身份访问业务数据的工具，在这里用闭包绑定 `user`，参考 `examples/per_user_tools.py`。
-- 也可以返回 `{"name": agent, ...}`，给用户多个 agent。
+- 需要以用户身份访问业务数据的工具，在这里用闭包绑定 `user`，参考 `examples/per_user_tools.py`。模型永远不提供用户 id。
+- 也可以返回 `{"name": agent, ...}`，给用户多个 agent，聊天界面会出现 agent 选择框。
+- 不要在多个用户之间共享同一个带状态的对象（工具、插件、连接），也不要修改共享 agent 上的"当前用户"。
 
 ## 替换认证
 
@@ -57,9 +40,17 @@ app = create_multiuser_app(
 )
 ```
 
-代理必须剥掉客户端自带的同名请求头，否则任何人都能冒充任何用户。换成 JWT、OIDC 的方式相同。
+代理必须剥掉客户端自带的同名请求头，否则任何人都能冒充任何用户。换成 JWT、OIDC 的方式相同。自定义 `auth` 时不再提供 `/login` 页面，`login_url` 指向你的登录入口，`{next}` 会被替换成登录后要回到的页面。
 
-**换用户系统**：实现 `Directory` 的三个异步方法 `get`、`list`、`set_disabled`，传给 `directory=`。`get` 每个请求都会调用，要快（需要时自己加短缓存，但要让停用及时生效）。自定义 `directory` 时必须同时提供 `auth`。
+**换用户系统**：实现 `Directory` 的三个异步方法，传给 `directory=`：
+
+| 方法 | 作用 |
+| --- | --- |
+| `get(user_id) -> User \| None` | 每个请求都会调用，要快；需要缓存时，保证停用能及时生效 |
+| `list() -> list[User]` | 管理后台和每 30 秒一次的同步用 |
+| `set_disabled(user_id, disabled)` | 管理后台的停用 / 启用按钮用 |
+
+`User` 的 `id` 必须是 slug（小写字母、数字、`_`、`-`，最长 32 位），它会出现在 URL 和目录名里。外部身份（邮箱、工号）请在 `Directory` 里映射成稳定的 slug。自定义 `directory` 时必须同时提供 `auth`。
 
 ## create_multiuser_app 参数
 
@@ -71,43 +62,45 @@ app = create_multiuser_app(
 | `auth` | `CookieAuth` | 认证 |
 | `login_url` | `/login?next={next}` | 未登录时跳转的地址 |
 | `title` | `lovia` | 页面标题 |
-| `chat_ui` | `ChatUI()` | 聊天页空白态文案和示例 |
-| `app_options` | `{}` | 传给每个用户 `create_app()` 的参数，如 `max_background_runs`、`budget`、`followups` |
-| `reconcile_interval` | `30` | 与目录同步的间隔（秒） |
+| `chat_ui` | `ChatUI()` | 聊天页空白态的标题、说明和示例问题 |
+| `app_options` | `{}` | 传给每个用户 `create_app()` 的参数 |
+| `reconcile_interval` | `30` | 与用户目录同步的间隔（秒） |
+
+`app_options` 常用项（完整列表见 lovia 的 `create_app` 文档）：
+
+| 键 | 说明 |
+| --- | --- |
+| `max_background_runs` | 每个用户同时运行的对话数上限，默认 8 |
+| `budget` | 每次运行的 token、时长、工具调用上限（`RunBudget`） |
+| `max_turns` | 每次运行的最大轮数，默认 50 |
+| `generate_titles` | 是否用模型生成对话标题，默认开 |
+| `followups` | 回复后给出推荐追问，默认关；每次运行多一次模型调用 |
+| `approval_timeout` | 工具审批的等待超时（秒） |
 
 `app_options` 不能包含 `db_path`、`store`、`session`、`ui`、`title`、`token`、`auth`，这些由本项目统一设置。
 
-## 部署清单
-
-- **TLS**：放在 HTTPS 反向代理后面，并传 `CookieAuth(..., secure=True)`（`examples/serve.py` 用环境变量 `LOVIA_MU_SECURE=1`）。
-- **单 worker**：运行状态在进程内存里，不要开多个 uvicorn worker。
-- **反向代理**：`/u/*/api/chat/stream`、`/u/*/api/events` 是 SSE，关闭缓冲（nginx `proxy_buffering off`）并调大读超时。
-- **部署在域名根路径或子域名下**：暂不支持整体挂在路径前缀下。
-- **数据目录**：只允许服务进程的用户读写；`secret` 丢失会让所有人重新登录。
-- **备份**：备份整个 `data/`。每个用户的数据在 `users/<id>/` 下，可以单独备份和恢复。
-
-## 运维
-
-```bash
-lovia-multiuser users list
-lovia-multiuser users disable alice      # 30 秒内停止其后台工作；后台操作则立即生效
-lovia-multiuser users enable alice
-lovia-multiuser users passwd alice
-lovia-multiuser audit --owner alice --limit 100
-```
-
-所有命令都接受 `--data DIR`（默认 `./data`）。
+## 数据导出与删除
 
 **导出某个用户的数据**：复制 `data/users/<id>/`。`chat.db` 是 SQLite，可以用 lovia 的 `ChatStore.sqlite(path)` 读取。
 
-**删除某个用户**：先停用（让服务关闭其 app），再删除 `data/users/<id>/`。参考实现的 `Accounts` 没有删除命令，账号保持停用即可；审计记录按需保留。
+**删除某个用户**：先停用（让服务关闭其应用），再删除 `data/users/<id>/`。参考实现的 `Accounts` 没有删除命令，账号保持停用即可；审计记录按需保留。
+
+## 不配置模型的演示
+
+`examples/demo.py` 在 `./demo-data` 里创建 `alice`、`bob`、`admin` 三个演示账号，每条消息都返回固定回复，适合在没有模型的环境里检查界面：
+
+```bash
+python examples/demo.py
+```
+
+密码写在脚本里，只用于本地演示。
 
 ## 开发
 
 ```bash
-uv venv && uv pip install -e ".[dev]"
+uv pip install -e ".[dev]"
 pytest
 ruff check . && ruff format --check .
 ```
 
-测试用 lovia 的 `ScriptedProvider`，不访问网络。
+测试用 lovia 的 `ScriptedProvider`，不访问网络。约定和容易踩的坑见 [AGENTS.md](../AGENTS.md)。
