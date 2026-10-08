@@ -158,6 +158,15 @@ class Accounts:
             raise ValueError(f"user {user_id!r} already exists") from None
         return user
 
+    async def bootstrap_admin(self, user_id: str = "admin") -> str | None:
+        """First run: with no accounts at all, create admin ``user_id`` with a
+        random password and return it — the only copy. ``None`` otherwise."""
+        if await self.list():
+            return None
+        password = secrets.token_urlsafe(12)
+        await self.add(user_id, password, name="管理员", admin=True)
+        return password
+
     async def set_password(self, user_id: str, password: str) -> None:
         await asyncio.to_thread(
             self._update, "password_hash = ?", (hash_password(password),), user_id

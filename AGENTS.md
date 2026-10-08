@@ -15,16 +15,21 @@ a reference implementation, meant to be replaced by the business's own.
 ## Setup & commands
 
 ```bash
-uv venv && uv pip install -e ".[dev]"
+uv sync --extra dev        # or let `uv run` sync on first use
 ```
 
 | Task | Command |
 | --- | --- |
-| Test (all) | `pytest` |
-| Test (one) | `pytest tests/test_admin.py::test_search_spans_every_user` |
-| Lint / format | `ruff check .` / `ruff format .` |
-| Try the UI (no API key) | `python examples/demo.py` |
-| Manage users | `lovia-multiuser --data data users ...` |
+| Test (all) | `uv run --extra dev pytest` |
+| Test (one) | `uv run --extra dev pytest tests/test_admin.py::test_search_spans_every_user` |
+| Lint / format | `uv run --extra dev ruff check .` / `uv run --extra dev ruff format .` |
+| Serve (real model) | `uv run examples/serve.py` — needs `.env` (copy `.env.example`) |
+| Try the UI (no API key) | `uv run examples/demo.py` |
+| Manage users | `uv run lovia-multiuser users ...` |
+
+Configuration is environment variables; entry points (`examples/*.py`, the
+CLI) call `env.load_env()` first, so the nearest `.env` is picked up and real
+variables win. Keep new settings in that scheme, prefixed `LOVIA_MU_`.
 
 ## Architecture
 
@@ -35,6 +40,7 @@ uv venv && uv pip install -e ".[dev]"
 | `auth.py` | `Authenticator` seam + reference `CookieAuth` (login form, signed cookie) |
 | `accounts.py` | `Directory` seam + reference `Accounts` (SQLite, scrypt) |
 | `audit.py` | append-only audit log (SQLite) |
+| `env.py` | `.env` loading, `LOVIA_MU_DATA` |
 | `admin.py` + `templates/admin/` | admin console |
 | `templates/chat/index.html` | overrides lovia's chat page (user menu, read-only banner) |
 
@@ -86,6 +92,6 @@ Three seams, everything else stays: `Authenticator` (who is asking),
 ## Don't
 
 - Don't grant shell or a writable-anywhere workspace in `examples/` or docs.
-- Don't add a hard dependency beyond `lovia[web]` and `uvicorn`.
+- Don't add a hard dependency beyond `lovia[web]`, `python-dotenv`, and `uvicorn`.
 - Don't fork lovia's chat UI; customize through `ChatUI(templates=...)` blocks
   (`head`, `sidebar_footer`, `body_end`) only.

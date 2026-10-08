@@ -9,6 +9,7 @@ from lovia_multiuser.audit import AuditLog
 
 def run(tmp_path, monkeypatch, *argv, stdin=""):
     monkeypatch.setattr("sys.stdin", io.StringIO(stdin))
+    monkeypatch.chdir(tmp_path)  # away from a developer's .env
     return main(["--data", str(tmp_path), *argv])
 
 

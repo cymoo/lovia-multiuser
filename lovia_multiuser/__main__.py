@@ -4,7 +4,9 @@
     lovia-multiuser users list | passwd ID | disable ID | enable ID
     lovia-multiuser audit [--actor ID] [--owner ID] [--limit N]
 
-Serving is code — the agents are yours: see examples/serve.py.
+The data directory is --data, else LOVIA_MU_DATA (read from the project's
+.env too), else ./data. Serving is code — the agents are yours: see
+examples/serve.py.
 """
 
 from __future__ import annotations
@@ -18,6 +20,7 @@ from pathlib import Path
 
 from .accounts import Accounts
 from .audit import AuditLog
+from .env import data_dir, load_env
 
 MIN_PASSWORD = 8
 
@@ -35,7 +38,7 @@ def _read_password(user_id: str) -> str:
 
 
 async def _run(args: argparse.Namespace) -> None:
-    data = Path(args.data)
+    data = Path(args.data) if args.data else data_dir()
     if args.command == "audit":
         entries = await AuditLog(data / "audit.db").recent(
             actor=args.actor, owner=args.owner, limit=args.limit
@@ -81,7 +84,7 @@ def main(argv: list[str] | None = None) -> int:
         prog="lovia-multiuser", description=__doc__.split("\n\n")[0]
     )
     parser.add_argument(
-        "--data", default="data", help="data directory (default: ./data)"
+        "--data", help="data directory (default: $LOVIA_MU_DATA, else ./data)"
     )
     commands = parser.add_subparsers(dest="command", required=True)
 
@@ -102,6 +105,7 @@ def main(argv: list[str] | None = None) -> int:
     audit.add_argument("--limit", type=int, default=50)
 
     args = parser.parse_args(argv)
+    load_env()
     try:
         asyncio.run(_run(args))
     except (KeyError, ValueError) as exc:

@@ -5,7 +5,7 @@ reaches a tool the other way: each user's agent is built with tools already
 bound to that user. The model never supplies the user id, so it cannot ask
 for someone else's data.
 
-    LOVIA_MODEL=... python examples/per_user_tools.py
+    uv run examples/per_user_tools.py      # model settings from .env
 """
 
 from __future__ import annotations
@@ -16,6 +16,7 @@ from lovia import Agent, model_from_env, tool
 from lovia.web import serve
 
 from lovia_multiuser import User, create_multiuser_app
+from lovia_multiuser.env import data_dir, load_env
 
 # Stand-in for your business database.
 ORDERS = {
@@ -23,6 +24,7 @@ ORDERS = {
     "bob": [{"id": "B-2001", "item": "显示器", "status": "待付款"}],
 }
 
+load_env()
 MODEL = model_from_env()
 
 
@@ -54,4 +56,4 @@ def agents(user: User, home: Path) -> Agent:
 
 
 if __name__ == "__main__":
-    serve(create_multiuser_app(agents, data_dir="data"), port=8000)
+    serve(create_multiuser_app(agents, data_dir=data_dir()), port=8000)

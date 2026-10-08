@@ -13,7 +13,7 @@ def agents(user: User, home: Path) -> Agent:
         model=MODEL,
         workspace=Workspace.local(str(home / "files"), mode="readonly"),
         plugins=[Memory(home / "memory")],
-        tools=order_tools(user),   # 绑定到该用户的工具
+        tools=order_tools(user),  # 绑定到该用户的工具
     )
 ```
 
@@ -32,8 +32,10 @@ class ProxyHeaderAuth:
     async def authenticate(self, request):
         return request.headers.get("X-Forwarded-User") or None
 
+
 app = create_multiuser_app(
-    agents, data_dir="data",
+    agents,
+    data_dir="data",
     directory=Accounts("data/accounts.db"),
     auth=ProxyHeaderAuth(),
     login_url="/oauth2/start?rd={next}",
@@ -90,7 +92,7 @@ app = create_multiuser_app(
 `examples/demo.py` 在 `./demo-data` 里创建 `alice`、`bob`、`admin` 三个演示账号，每条消息都返回固定回复，适合在没有模型的环境里检查界面：
 
 ```bash
-python examples/demo.py
+uv run examples/demo.py
 ```
 
 密码写在脚本里，只用于本地演示。
@@ -98,9 +100,9 @@ python examples/demo.py
 ## 开发
 
 ```bash
-uv pip install -e ".[dev]"
-pytest
-ruff check . && ruff format --check .
+uv run --extra dev pytest
+uv run --extra dev ruff check .
+uv run --extra dev ruff format --check .
 ```
 
 测试用 lovia 的 `ScriptedProvider`，不访问网络。约定和容易踩的坑见 [AGENTS.md](../AGENTS.md)。

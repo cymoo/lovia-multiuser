@@ -10,94 +10,122 @@
 
 lovia 聊天界面已有的功能都原样可用：流式输出、断线重连、工具审批、定时任务、子任务、文件与记忆面板。
 
-## 环境要求
+## 快速开始
 
-- Python 3.10 或更高
-- 一个模型服务：OpenAI、Anthropic，或任何 OpenAI 兼容服务（DeepSeek、Ollama、vLLM 等）
-- 推荐用 [uv](https://docs.astral.sh/uv/) 管理虚拟环境，pip 也可以
+需要一个模型服务的 API key：OpenAI、Anthropic，或 DeepSeek、Ollama 等 OpenAI 兼容服务。
 
-## 1. 安装
+推荐用 [uv](https://docs.astral.sh/uv/) 运行：它会自动准备 Python、创建虚拟环境、安装依赖，不需要手动激活环境，Windows、macOS、Linux 的命令完全相同。安装 uv：
+
+```bash
+# macOS / Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+# Windows（PowerShell）
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+### 1. 获取代码
 
 ```bash
 git clone https://github.com/cymoo/lovia-multiuser.git
 cd lovia-multiuser
-uv venv
-source .venv/bin/activate
-uv pip install -e .
 ```
 
-用 pip：
+### 2. 配置模型
+
+把 `.env.example` 复制为 `.env`：
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -e .
-```
-
-安装后可以使用 `lovia-multiuser` 命令（等价于 `python -m lovia_multiuser`）。以下命令都在项目根目录、已激活虚拟环境的终端里执行。
-
-## 2. 配置模型
-
-```bash
+# macOS / Linux
 cp .env.example .env
+# Windows
+copy .env.example .env
 ```
 
-编辑 `.env`，保留一组模型配置：
+打开 `.env`，保留一组模型配置，填上自己的 key：
 
-| 模型服务 | 配置 |
+| 模型服务 | `.env` 内容 |
 | --- | --- |
 | OpenAI | `LOVIA_MODEL=openai:gpt-5.5`<br>`OPENAI_API_KEY=sk-...` |
 | Anthropic | `LOVIA_MODEL=anthropic:claude-sonnet-5-5`<br>`ANTHROPIC_API_KEY=sk-ant-...` |
-| DeepSeek（OpenAI 兼容） | `LOVIA_MODEL=deepseek-chat`<br>`OPENAI_BASE_URL=https://api.deepseek.com`<br>`OPENAI_API_KEY=sk-...` |
+| DeepSeek | `LOVIA_MODEL=deepseek-chat`<br>`OPENAI_BASE_URL=https://api.deepseek.com`<br>`OPENAI_API_KEY=sk-...` |
 | 本机 Ollama | `LOVIA_MODEL=qwen3`<br>`OPENAI_BASE_URL=http://localhost:11434/v1`<br>`OPENAI_API_KEY=ollama` |
 
-`LOVIA_MODEL` 带 `openai:` 或 `anthropic:` 前缀时走对应官方协议；不带前缀时走 OpenAI 兼容协议，发往 `OPENAI_BASE_URL`。更多写法见 lovia 的 [Provider 文档](https://github.com/cymoo/lovia/blob/main/docs/zh/providers.md)。
+`LOVIA_MODEL` 带 `openai:` 或 `anthropic:` 前缀时走对应的官方协议；不带前缀时走 OpenAI 兼容协议，发往 `OPENAI_BASE_URL`。更多写法见 lovia 的 [Provider 文档](https://github.com/cymoo/lovia/blob/main/docs/zh/providers.md)。
 
-把 `.env` 加载到当前终端（每开一个新终端都要执行一次）：
+`.env` 在启动时自动加载，不需要手动导出到终端；终端里已经设置的同名环境变量优先。`.env` 已被 git 忽略，不会提交密钥。
+
+### 3. 启动
 
 ```bash
-set -a && source .env && set +a
+uv run examples/serve.py
 ```
 
-`.env` 已被 git 忽略，不会提交密钥。
+首次运行会先安装依赖，稍等片刻。启动后终端显示：
 
-## 3. 创建账号
+```
+首次启动，已创建管理员账号：admin，密码：xxxxxxxxxxxxxxxx
+（只显示这一次。修改密码：lovia-multiuser users passwd admin）
 
-先创建至少一个管理员，再创建普通用户：
+模型：openai:gpt-5.5　数据目录：/…/lovia-multiuser/data
+打开 http://127.0.0.1:8000 登录
+```
+
+浏览器打开 <http://127.0.0.1:8000>，用 `admin` 和这个密码登录。密码只显示一次，忘了可以用 `uv run lovia-multiuser users passwd admin` 重设。按 `Ctrl+C` 停止服务。
+
+### 不用 uv
 
 ```bash
-lovia-multiuser users add admin --name 管理员 --admin
-lovia-multiuser users add alice --name Alice
-lovia-multiuser users list
+python -m venv .venv
+# macOS / Linux
+source .venv/bin/activate
+# Windows
+.venv\Scripts\activate
+
+pip install -e .
+python examples/serve.py
+```
+
+之后文中的 `uv run <命令>`，在已激活虚拟环境的终端里直接运行 `<命令>` 即可，例如 `lovia-multiuser users list`。
+
+## 添加用户
+
+```bash
+uv run lovia-multiuser users add alice --name Alice
+uv run lovia-multiuser users add bob --name Bob
+uv run lovia-multiuser users list
 ```
 
 - 每条命令会要求输入两次密码，至少 8 位。
 - 用户 id 用于登录和 URL，只能是小写字母、数字、`_`、`-`，最长 32 位；`--name` 是显示名，可以用中文。
-- 数据默认存在 `./data/`。用 `--data 目录` 可以换位置，但要和启动时的 `LOVIA_MU_DATA` 保持一致。
+- 加 `--admin` 创建管理员。
+- 服务运行中也可以添加，新用户马上就能登录。
 
-## 4. 启动服务
+## 配置项
 
-```bash
-python examples/serve.py
-```
+全部通过环境变量设置，写在 `.env` 里即可：
 
-浏览器打开 <http://127.0.0.1:8000> 并登录。
-
-启动时可以通过环境变量调整（也可以写进 `.env`）：
-
-| 环境变量 | 默认值 | 说明 |
+| 变量 | 默认值 | 说明 |
 | --- | --- | --- |
+| `LOVIA_MODEL` | 必填 | 模型，见上面的表格 |
+| `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` | 按模型必填 | 模型服务的 key |
+| `OPENAI_BASE_URL` / `ANTHROPIC_BASE_URL` | 官方地址 | 兼容服务或代理的地址 |
 | `LOVIA_MU_DATA` | `data` | 数据目录：账号、审计日志、签名密钥、每个用户的数据 |
-| `HOST` | `127.0.0.1` | 监听地址；让局域网访问用 `0.0.0.0` |
-| `PORT` | `8000` | 端口 |
+| `LOVIA_MU_HOST` | `127.0.0.1` | 监听地址；让局域网访问用 `0.0.0.0` |
+| `LOVIA_MU_PORT` | `8000` | 端口 |
 | `LOVIA_MU_SECURE` | 未设置 | 部署在 HTTPS 后面时设为 `1`，登录 cookie 只通过 HTTPS 发送 |
 
-常见启动错误：
+请求超时、代理、自定义证书等网络设置，见 lovia 的 [Provider 文档 · 网络](https://github.com/cymoo/lovia/blob/main/docs/zh/providers.md#网络超时代理tls)。
 
-- `no model configured in the environment`：没有设置 `LOVIA_MODEL`，检查第 2 步是否在当前终端执行过。
-- `no accounts in data/ yet`：还没有账号，先做第 3 步。
+启动服务和运行命令都在项目根目录执行：`.env` 从当前目录开始查找，数据目录默认也相对于当前目录。
 
-## 5. 使用
+**常见问题**
+
+- **提示"没有找到 .env 文件"或"没有 LOVIA_MODEL"**：检查项目根目录下有没有 `.env`，里面的 `LOVIA_MODEL` 是否取消了注释。
+- **能打开页面，但发消息后报认证错误**：API key 不对，或者 `LOVIA_MODEL` 和 key 不是同一家服务。
+- **端口被占用**：在 `.env` 里设置 `LOVIA_MU_PORT=8001`。
+- **Windows 提示找不到 `uv`**：安装 uv 后重新打开终端。
+
+## 使用
 
 ### 普通用户
 
@@ -121,7 +149,7 @@ python examples/serve.py
 
 **停用账号**后，该用户立即被登出，正在进行的运行停止，定时任务不再触发，记录保留供管理员查看。重新启用后恢复。
 
-## 6. 定制 agent
+## 定制 agent
 
 每个用户的 agent 由 `examples/serve.py` 里的 `agents(user, home)` 构建，`home` 是该用户的私有目录 `data/users/<id>/`。可以直接修改它，或复制到自己的项目里：
 
@@ -130,8 +158,8 @@ def agents(user: User, home: Path) -> Agent:
     return Agent(
         name="assistant",
         instructions=f"You are a helpful assistant. The person you are talking to is {user.name}.",
-        model=model_from_env(),
-        tools=[...],                                   # 你的工具
+        model=MODEL,
+        tools=[...],  # 你的工具
         workspace=Workspace.local(str(home / "files"), mode="readonly"),
         plugins=[Memory(home / "memory")],
     )
@@ -142,7 +170,7 @@ def agents(user: User, home: Path) -> Agent:
 - 需要以当前用户身份查询业务数据的工具，在这里绑定 `user`，参考 [examples/per_user_tools.py](examples/per_user_tools.py)。
 - 服务级参数（每个用户的并发上限、预算、推荐追问等）通过 `create_multiuser_app(app_options=...)` 传给每个用户的 lovia 应用，见[使用指南](docs/guide.md#create_multiuser_app-参数)。
 
-## 7. 接入自己的认证
+## 接入自己的认证
 
 自带的账号密码登录是参考实现。要换成公司的 SSO，实现一个方法即可：
 
@@ -154,18 +182,18 @@ class ProxyHeaderAuth:
 
 完整示例见 [examples/proxy_auth.py](examples/proxy_auth.py)；替换用户系统（角色、停用状态）见[使用指南 · 替换认证](docs/guide.md#替换认证)。
 
-## 8. 日常运维
+## 日常运维
 
 | 命令 | 作用 |
 | --- | --- |
-| `lovia-multiuser users list` | 列出用户 |
-| `lovia-multiuser users add <id> [--name 名字] [--admin]` | 新建用户 |
-| `lovia-multiuser users passwd <id>` | 重设密码 |
-| `lovia-multiuser users disable <id>` | 停用账号 |
-| `lovia-multiuser users enable <id>` | 启用账号 |
-| `lovia-multiuser audit [--actor id] [--owner id] [--limit N]` | 查看审计记录 |
+| `uv run lovia-multiuser users list` | 列出用户 |
+| `uv run lovia-multiuser users add <id> [--name 名字] [--admin]` | 新建用户 |
+| `uv run lovia-multiuser users passwd <id>` | 重设密码 |
+| `uv run lovia-multiuser users disable <id>` | 停用账号 |
+| `uv run lovia-multiuser users enable <id>` | 启用账号 |
+| `uv run lovia-multiuser audit [--actor id] [--owner id] [--limit N]` | 查看审计记录 |
 
-所有命令都接受 `--data 目录`。用命令行停用或启用，运行中的服务会在 30 秒内同步；在管理后台操作则立即生效。
+命令使用和服务相同的数据目录（`.env` 里的 `LOVIA_MU_DATA`，或 `--data 目录`）。用命令行停用或启用，运行中的服务会在 30 秒内同步；在管理后台操作则立即生效。
 
 数据目录结构（整体备份 `data/` 即可）：
 
@@ -180,9 +208,9 @@ data/
     memory/          记忆
 ```
 
-## 9. 部署上线
+## 部署上线
 
-- **HTTPS**：放在 nginx 等反向代理后面，设置 `LOVIA_MU_SECURE=1`。
+- **HTTPS**：放在 nginx 等反向代理后面，在 `.env` 里设置 `LOVIA_MU_SECURE=1`。
 - **单进程**：运行中的对话保存在进程内存里，不要开多个 worker。
 - **部署在域名根路径或子域名下**：暂不支持挂在 `/chat/` 这样的路径前缀下。
 - **流式输出**：反向代理要关闭缓冲并调大超时，否则回复会卡住或中断。
@@ -209,7 +237,7 @@ server {
 }
 ```
 
-## 10. 模型调用成本
+## 模型调用成本
 
 每条消息除了回复本身，还可能产生额外的模型调用：
 
@@ -223,9 +251,9 @@ server {
 ## 开发
 
 ```bash
-uv pip install -e ".[dev]"
-pytest                                   # 测试不调用真实模型
-ruff check . && ruff format --check .
+uv run --extra dev pytest                # 测试不调用真实模型
+uv run --extra dev ruff check .
+uv run --extra dev ruff format --check .
 ```
 
 ## 文档

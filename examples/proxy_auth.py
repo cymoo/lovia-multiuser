@@ -8,7 +8,7 @@ still come from the directory.
 Only run this behind that proxy, and make sure the proxy strips any
 client-sent copy of the header — otherwise anyone can claim any user.
 
-    LOVIA_MODEL=... python examples/proxy_auth.py
+    uv run examples/proxy_auth.py      # model settings from .env
 """
 
 from __future__ import annotations
@@ -21,7 +21,9 @@ from lovia import Agent, model_from_env
 from lovia.web import serve
 
 from lovia_multiuser import Accounts, User, create_multiuser_app
+from lovia_multiuser.env import data_dir, load_env
 
+load_env()
 MODEL = model_from_env()
 
 
@@ -40,10 +42,10 @@ def agents(user: User, home: Path) -> Agent:
 if __name__ == "__main__":
     app = create_multiuser_app(
         agents,
-        data_dir="data",
+        data_dir=data_dir(),
         # Still the reference directory for roles and disabling; point this at
         # your user system instead by implementing lovia_multiuser.Directory.
-        directory=Accounts(Path("data") / "accounts.db"),
+        directory=Accounts(data_dir() / "accounts.db"),
         auth=ProxyHeaderAuth(),
         # The proxy's sign-in page; {next} is the page to come back to.
         login_url=os.environ.get("LOGIN_URL", "/oauth2/start?rd={next}"),

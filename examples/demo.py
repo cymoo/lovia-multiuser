@@ -1,6 +1,6 @@
 """Try the multi-user UI without a model API key.
 
-    python examples/demo.py
+    uv run examples/demo.py
     # open http://127.0.0.1:8000 — alice / bob / admin, password "demo-password"
 
 Seeds three accounts in ./demo-data and answers every message with a canned
@@ -46,4 +46,4 @@ if __name__ == "__main__":
     app = create_multiuser_app(
         agents, data_dir=DATA, app_options={"generate_titles": False}
     )
-    serve(app, host="127.0.0.1", port=int(os.environ.get("PORT", "8000")))
+    serve(app, host="127.0.0.1", port=int(os.environ.get("LOVIA_MU_PORT") or "8000"))
