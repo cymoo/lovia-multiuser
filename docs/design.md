@@ -97,7 +97,7 @@ data/
 
 用户 id 限定为 `[a-z0-9][a-z0-9_-]{0,31}`，因为它同时出现在 URL 和目录名里；显示名任意。接入外部身份系统时，用稳定的内部 id，不要用会变的邮箱或显示名。
 
-**工具以用户身份访问业务数据**：lovia.web 不向运行传 `context=`，所以身份在构建 agent 时绑定（工具通过闭包拿到当前用户），模型永远不提供用户 id（见 `examples/per_user_tools.py`）。绝不修改共享 agent 上的"当前用户"。
+**工具以用户身份访问业务数据**：身份在构建 agent 时绑定（工具通过闭包拿到当前用户），模型永远不提供用户 id（见 `examples/per_user_tools.py`）。lovia 0.9.95 起有 `create_app(run_context=)`，但定时任务和子任务的运行没有对应的请求（`trigger.request` 为 `None`），靠它分辨不出是谁的运行，所以不用它传身份。绝不修改共享 agent 上的"当前用户"。
 
 ## 6. 管理员
 
@@ -114,7 +114,7 @@ data/
 - `http`：进入他人空间的请求，含方法、路径、查询串和响应状态。包括管理员查看、被拒的写操作、越权访问（404）。
 - `user.disable` / `user.enable`：账号操作。
 
-不记录：本人在自己空间的请求、静态资源、lovia UI 每次打开页面都会重复的后台刷新（`/api/info`、`/api/agents`、`/api/events`、`/api/sessions` 列表、`/api/runs`、`/api/runs/history`）成功的请求。不过滤的话，管理员打开一次页面约有 14 条记录，真正打开了哪个对话会被淹没。被拒绝的请求始终记录。
+不记录：本人在自己空间的请求、静态资源（`/static/` 和 `ChatUI.assets` 所在的 `/ui/`）、lovia UI 每次打开页面都会重复的后台刷新（`/api/info`、`/api/agents`、`/api/events`、`/api/sessions` 列表、`/api/runs`、`/api/runs/history`）成功的请求。不过滤的话，管理员打开一次页面约有 14 条记录，真正打开了哪个对话会被淹没。被拒绝的请求始终记录。
 
 查询：后台"审计"页（按操作者、对象用户筛选），或 `lovia-multiuser audit`。
 

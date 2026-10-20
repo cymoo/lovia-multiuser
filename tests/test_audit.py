@@ -40,6 +40,7 @@ def test_own_space_and_static_assets_are_not_recorded(env):
     html = env.as_("root").get("/u/alice/").text
     asset = html.split('href="/u/alice/static/', 1)[1].split('"', 1)[0]
     env.as_("root").get(f"/u/alice/static/{asset}")
+    env.as_("root").get("/u/alice/ui/theme.css")  # ChatUI.assets
     assert [e.detail for e in entries(env)] == ["GET /"]
 
 

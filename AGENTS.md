@@ -56,7 +56,8 @@ Three seams, everything else stays: `Authenticator` (who is asking),
   same 404, same body. Don't look the owner up before knowing the viewer is an admin.
 - **Admins are read-only in someone else's space**: `SAFE_METHODS` only.
 - **Audit**: every request into another user's space is recorded, except
-  static assets and successful `UI_REFRESH` reads; denials are always recorded.
+  static assets (`/static/`, and `/ui/` for `ChatUI.assets`) and successful
+  `UI_REFRESH` reads; denials are always recorded.
   A new chrome endpoint the lovia UI polls on page load belongs in `UI_REFRESH`.
 - **The directory is read on every request** — that's what makes disabling
   instant. Don't cache user state without an invalidation story.
@@ -70,8 +71,9 @@ Three seams, everything else stays: `Authenticator` (who is asking),
   `test_the_chat_page_and_its_assets_live_under_the_prefix` guards it.
 - **Workspaces are `readonly` or absent.** The local workspace is a policy gate,
   not a sandbox; shell or `coding`/`trusted` lets one user reach another's files.
-- **Per-user identity reaches tools by binding in `agent_factory`** (lovia.web
-  passes no `context=` to runs). Never mutate a shared `Agent`.
+- **Per-user identity reaches tools by binding in `agent_factory`**, not through
+  lovia's `create_app(run_context=)`: its trigger has no request for scheduled
+  and subagent runs, so it can't tell whose run it is. Never mutate a shared `Agent`.
 
 ## Tests
 
@@ -93,5 +95,7 @@ Three seams, everything else stays: `Authenticator` (who is asking),
 
 - Don't grant shell or a writable-anywhere workspace in `examples/` or docs.
 - Don't add a hard dependency beyond `lovia[web]`, `python-dotenv`, and `uvicorn`.
-- Don't fork lovia's chat UI; customize through `ChatUI(templates=...)` blocks
-  (`head`, `sidebar_footer`, `body_end`) only.
+- Don't fork lovia's chat UI; customize through the template blocks of
+  `ChatUI(assets=...)` (`templates/chat/index.html`). Stick to lovia's public
+  contract — block names, `data-part`, design variables, `data-i18n` keys;
+  its ids and class names are internal.

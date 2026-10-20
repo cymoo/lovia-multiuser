@@ -96,7 +96,7 @@ name = "exceptiongroup"
 version = "1.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/50/79/66800aadf48771f6b62f7eb014e352e5d06856655206165d775e675a02c9/exceptiongroup-1.3.1.tar.gz", hash = "sha256:8b412432c6055b0b7d14c310000ae93352ed6754f70fa8f7c34141f91c4e3219", size = 30371, upload-time = "2025-11-21T23:01:54.787Z" }
 wheels = [
@@ -239,16 +239,16 @@ wheels = [
 
 [[package]]
 name = "lovia"
-version = "0.9.75"
+version = "0.9.96"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx" },
     { name = "pydantic" },
     { name = "pyyaml" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/7b/c9/348ade398b646812e73cec5bc1c1b1ebc5fcc826df11e51bc75be3c56b4b/lovia-0.9.75.tar.gz", hash = "sha256:1f8164460f21dd77629594cb10914cfd8ec67ff10e89a6c8c04d47eb9767557e", size = 2547907, upload-time = "2026-09-28T09:59:19.321Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/fd/cd/2cc404a1d5bd53b24324c01340005475737573ff5a5509e7cf366a1127f1/lovia-0.9.96.tar.gz", hash = "sha256:cd63c5f912ea3f5d44c26da2e9a691f6c22909d7217b639b15c6a1ecc2e2b6d0", size = 3113271, upload-time = "2026-10-20T07:37:29.437Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/57/21/962048132e89dbc4b6b92a379b969ba867206b6492283a090bb7d23a9b11/lovia-0.9.75-py3-none-any.whl", hash = "sha256:8fd8cd892ef0f9aa80efac5bd17cc81c76448c2cc4bf667c266d086bf7e39821", size = 1541803, upload-time = "2026-09-28T09:59:17.188Z" },
+    { url = "https://files.pythonhosted.org/packages/83/ae/d2ad68da0b4967a7407ebd0cdbb76931f9123d0ff12bfb44b86db0840f2b/lovia-0.9.96-py3-none-any.whl", hash = "sha256:2383b9fcf1040f44e44e87a97c710615f973fdbe69ca9b50424f212e8d3a4ac7", size = 1982157, upload-time = "2026-10-20T07:37:27.269Z" },
 ]
 
 [package.optional-dependencies]
@@ -282,7 +282,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "lovia", extras = ["web"], specifier = ">=0.9.75" },
+    { name = "lovia", extras = ["web"], specifier = ">=0.9.96" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
     { name = "python-dotenv", specifier = ">=1.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.6" },

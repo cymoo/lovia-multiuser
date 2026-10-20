@@ -54,8 +54,11 @@ UI_REFRESH = frozenset(
         "/api/runs/history",
     }
 )
-# create_app() options this app owns for every tenant.
-_RESERVED = frozenset({"db_path", "store", "session", "ui", "title", "token", "auth"})
+# create_app() options this app owns for every tenant. ``lifespan`` too: Tenants
+# enters lovia's own lifespan, so one passed here would silently never run.
+_RESERVED = frozenset(
+    {"db_path", "store", "session", "ui", "title", "token", "auth", "lifespan"}
+)
 
 
 def templates() -> Jinja2Templates:
@@ -164,7 +167,8 @@ def _dispatcher(mu: MultiUser) -> Callable[[Scope, Receive, Send], Awaitable[Non
         if foreign:
             # A non-admin never learns whether another owner exists: 404 either way.
             owner = await mu.directory.get(owner_id) if viewer.admin else None
-        audited = foreign and not sub.startswith("/static/")
+        # lovia's bundled assets, and ours (ChatUI.assets, served under /ui).
+        audited = foreign and not sub.startswith(("/static/", "/ui/"))
         query = scope.get("query_string", b"").decode()
         detail = f"{scope['method']} {sub}" + (f"?{query}" if query else "")
 
@@ -248,7 +252,7 @@ def create_multiuser_app(
             raise ValueError("a custom directory= needs its own auth= as well")
         auth = CookieAuth(directory, load_secret(data))
 
-    ui = replace(chat_ui or ChatUI(), templates=TEMPLATES / "chat", login_url=login_url)
+    ui = replace(chat_ui or ChatUI(), assets=TEMPLATES / "chat", login_url=login_url)
 
     def build(user: User) -> FastAPI:
         home = mu.home(user.id)

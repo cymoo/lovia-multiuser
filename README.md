@@ -260,4 +260,5 @@ uv run --extra dev ruff format --check .
 
 - [设计方案](docs/design.md)：选型、请求处理、权限模型、审计、停用、安全边界、已知限制
 - [使用指南](docs/guide.md)：编写 agent、替换认证、全部参数、数据导出与删除
+- [升级到 lovia 0.9.96](docs/upgrade-lovia-0.9.96.md)：从 0.9.75 升级时要改什么
 - 示例：[serve.py](examples/serve.py)、[per_user_tools.py](examples/per_user_tools.py)、[proxy_auth.py](examples/proxy_auth.py)

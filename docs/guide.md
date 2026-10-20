@@ -64,7 +64,7 @@ app = create_multiuser_app(
 | `auth` | `CookieAuth` | 认证 |
 | `login_url` | `/login?next={next}` | 未登录时跳转的地址 |
 | `title` | `lovia` | 页面标题 |
-| `chat_ui` | `ChatUI()` | 聊天页空白态的标题、说明和示例问题 |
+| `chat_ui` | `ChatUI()` | 聊天页空白态的标题、说明和示例问题；其中 `assets` 和 `login_url` 由本项目设置 |
 | `app_options` | `{}` | 传给每个用户 `create_app()` 的参数 |
 | `reconcile_interval` | `30` | 与用户目录同步的间隔（秒） |
 
@@ -79,7 +79,7 @@ app = create_multiuser_app(
 | `followups` | 回复后给出推荐追问，默认关；每次运行多一次模型调用 |
 | `approval_timeout` | 工具审批的等待超时（秒） |
 
-`app_options` 不能包含 `db_path`、`store`、`session`、`ui`、`title`、`token`、`auth`，这些由本项目统一设置。
+`app_options` 不能包含 `db_path`、`store`、`session`、`ui`、`title`、`token`、`auth`，这些由本项目统一设置；也不能包含 `lifespan`，本项目只运行 lovia 自己的 lifespan，传入的不会执行。
 
 ## 数据导出与删除
 

@@ -1,9 +1,9 @@
 """Tools that act as the signed-in user.
 
-lovia.web does not pass a per-request ``context`` into runs, so identity
-reaches a tool the other way: each user's agent is built with tools already
-bound to that user. The model never supplies the user id, so it cannot ask
-for someone else's data.
+Each user's agent is built with tools already bound to that user — this holds
+for scheduled and subagent runs too, which lovia's ``run_context=`` hook gets
+no request for. The model never supplies the user id, so it cannot ask for
+someone else's data.
 
     uv run examples/per_user_tools.py      # model settings from .env
 """

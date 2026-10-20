@@ -9,7 +9,7 @@ description = "Multi-user serving for lovia agents: one app per user, admin read
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "lovia[web]>=0.9.75",
+    "lovia[web]>=0.9.96",
     "python-dotenv>=1.0",
     "uvicorn>=0.30",
 ]
