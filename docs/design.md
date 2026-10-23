@@ -97,7 +97,7 @@ data/
 
 用户 id 限定为 `[a-z0-9][a-z0-9_-]{0,31}`，因为它同时出现在 URL 和目录名里；显示名任意。接入外部身份系统时，用稳定的内部 id，不要用会变的邮箱或显示名。
 
-**工具以用户身份访问业务数据**：身份在构建 agent 时绑定（工具通过闭包拿到当前用户），模型永远不提供用户 id（见 `examples/per_user_tools.py`）。lovia 0.9.95 起有 `create_app(run_context=)`，但定时任务和子任务的运行没有对应的请求（`trigger.request` 为 `None`），靠它分辨不出是谁的运行，所以不用它传身份。绝不修改共享 agent 上的"当前用户"。
+**工具以用户身份访问业务数据**：身份在构建 agent 时绑定（工具通过闭包拿到当前用户），模型永远不提供用户 id（见 `examples/per_user_tools.py`）。lovia 有 `create_app(run_deps=)`（0.9.95 加入时叫 `run_context=`），但定时任务和子任务的运行没有对应的请求（`trigger.request` 为 `None`），靠它分辨不出是谁的运行，所以不用它传身份。绝不修改共享 agent 上的"当前用户"。
 
 ## 6. 管理员
 

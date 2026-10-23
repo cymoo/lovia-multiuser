@@ -72,7 +72,7 @@ Three seams, everything else stays: `Authenticator` (who is asking),
 - **Workspaces are `readonly` or absent.** The local workspace is a policy gate,
   not a sandbox; shell or `coding`/`trusted` lets one user reach another's files.
 - **Per-user identity reaches tools by binding in `agent_factory`**, not through
-  lovia's `create_app(run_context=)`: its trigger has no request for scheduled
+  lovia's `create_app(run_deps=)`: its trigger has no request for scheduled
   and subagent runs, so it can't tell whose run it is. Never mutate a shared `Agent`.
 
 ## Tests

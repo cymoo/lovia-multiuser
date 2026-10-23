@@ -1,7 +1,7 @@
 """Tools that act as the signed-in user.
 
 Each user's agent is built with tools already bound to that user — this holds
-for scheduled and subagent runs too, which lovia's ``run_context=`` hook gets
+for scheduled and subagent runs too, which lovia's ``run_deps=`` hook gets
 no request for. The model never supplies the user id, so it cannot ask for
 someone else's data.
 
