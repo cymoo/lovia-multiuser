@@ -75,7 +75,7 @@ app = create_multiuser_app(
 | `max_background_runs` | 每个用户同时运行的对话数上限，默认 8 |
 | `budget` | 每次运行的 token、时长、工具调用上限（`RunBudget`） |
 | `max_turns` | 每次运行的最大轮数，默认 50 |
-| `generate_titles` | 是否用模型生成对话标题，默认开 |
+| `titles` | 是否用模型生成对话标题，默认开 |
 | `followups` | 回复后给出推荐追问，默认关；每次运行多一次模型调用 |
 | `approval_timeout` | 工具审批的等待超时（秒） |
 

@@ -241,7 +241,7 @@ server {
 
 每条消息除了回复本身，还可能产生额外的模型调用：
 
-- 新对话生成标题：每个对话一次。不需要时传 `app_options={"generate_titles": False}`。
+- 新对话生成标题：每个对话一次。不需要时传 `app_options={"titles": False}`。
 - 记忆整理：每轮对话结束后一次。改成 `Memory(..., auto_curate=False)` 只保留模型主动记下的内容，或者去掉 `Memory` 插件。
 
 ## 安全边界
@@ -260,6 +260,7 @@ uv run --extra dev ruff format --check .
 
 - [设计方案](docs/design.md)：选型、请求处理、权限模型、审计、停用、安全边界、已知限制
 - [使用指南](docs/guide.md)：编写 agent、替换认证、全部参数、数据导出与删除
+- [升级到 lovia 0.9.114](docs/upgrade-lovia-0.9.114.md)：从 0.9.112 升级时要改什么
 - [升级到 lovia 0.9.112](docs/upgrade-lovia-0.9.112.md)：从 0.9.96 升级时要改什么
 - [升级到 lovia 0.9.96](docs/upgrade-lovia-0.9.96.md)：从 0.9.75 升级时要改什么
 - 示例：[serve.py](examples/serve.py)、[per_user_tools.py](examples/per_user_tools.py)、[proxy_auth.py](examples/proxy_auth.py)

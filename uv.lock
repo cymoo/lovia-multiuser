@@ -239,16 +239,16 @@ wheels = [
 
 [[package]]
 name = "lovia"
-version = "0.9.112"
+version = "0.9.114"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx" },
     { name = "pydantic" },
     { name = "pyyaml" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/2c/46/97b3b9a467e9d9355df4dbfdc767c8b0d1824f89493f85043b729691224c/lovia-0.9.112.tar.gz", hash = "sha256:c0dba0bf415541d5d9cb70b807f826742823ace16129bdb7765d95379f10e008", size = 3186722, upload-time = "2026-10-23T08:40:40.357Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ac/cd/960faf1bf774b1f34f2990d84e9c0c83e5884a1aedda77ccb7f7ca5262b8/lovia-0.9.114.tar.gz", hash = "sha256:bbbec330b47f5c22f427839789c79315cf50890b52cb14f0f1eaa4e229d34aeb", size = 3190601, upload-time = "2026-10-23T12:24:56.97Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3b/bb/2159c3a88aa7dbe56202beb1837708471a4060a5f0a16e87c5387f21f1bf/lovia-0.9.112-py3-none-any.whl", hash = "sha256:c6ffeded9d5106565c1509e67f9ca0a4bf2003fee26da97ca97c7c8455699e3e", size = 2000329, upload-time = "2026-10-23T08:40:38.331Z" },
+    { url = "https://files.pythonhosted.org/packages/0c/50/c98c7e9a92b2488daa92e12ca769206f4143bb4b79975ce65f810f971d24/lovia-0.9.114-py3-none-any.whl", hash = "sha256:6e48aa29121159aa6ae4a52662937967371f5dd51258e883412ea550f94f3dcd", size = 2002236, upload-time = "2026-10-23T12:24:54.822Z" },
 ]
 
 [package.optional-dependencies]
@@ -282,7 +282,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "lovia", extras = ["web"], specifier = ">=0.9.112" },
+    { name = "lovia", extras = ["web"], specifier = ">=0.9.114" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
     { name = "python-dotenv", specifier = ">=1.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.6" },

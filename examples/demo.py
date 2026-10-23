@@ -43,7 +43,5 @@ async def seed() -> None:
 
 if __name__ == "__main__":
     asyncio.run(seed())
-    app = create_multiuser_app(
-        agents, data_dir=DATA, app_options={"generate_titles": False}
-    )
+    app = create_multiuser_app(agents, data_dir=DATA, app_options={"titles": False})
     serve(app, host="127.0.0.1", port=int(os.environ.get("LOVIA_MU_PORT") or "8000"))

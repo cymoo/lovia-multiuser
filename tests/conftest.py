@@ -98,7 +98,7 @@ def env(data: Path) -> Iterator[Env]:
     app = create_multiuser_app(
         agents,
         data_dir=data,
-        app_options={"generate_titles": False, "scheduler_poll": 0.05},
+        app_options={"titles": False, "scheduler_poll": 0.05},
     )
     with TestClient(app) as client:
         yield Env(app, client, data)
