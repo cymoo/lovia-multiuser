@@ -60,10 +60,11 @@ def test_search_spans_every_user(env):
 def test_chat_page_shows_who_is_looking(env):
     admin_view = env.as_("root").get("/u/alice/").text
     assert "只读查看" in admin_view and "Alice" in admin_view
-    assert "#composer { display: none !important; }" in admin_view
+    hide_composer = '[data-part="composer"] { display: none; }'
+    assert hide_composer in admin_view
     assert 'href="/admin/users/alice"' in admin_view
 
     own = env.as_("alice").get("/u/alice/").text
-    assert "只读查看" not in own and "#composer { display: none" not in own
+    assert "只读查看" not in own and hide_composer not in own
     assert "退出登录" in own and 'href="/admin"' not in own
     assert 'href="/admin"' in env.as_("root").get("/u/root/").text

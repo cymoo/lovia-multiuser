@@ -1,35 +1,62 @@
 {#- Overrides lovia's chat page for every user's app (ChatUI(assets=...)).
     The dispatcher puts the signed-in `viewer` and the space's `owner` on
-    request.state; they differ only when an admin views someone else. -#}
+    request.state; they differ only when an admin views someone else.
+    Only lovia's public contract is used: block names, data-part and --lv-*
+    design variables. Rules here sit outside lovia's cascade layer, so they
+    win without !important. -#}
 {% extends "lovia/index.html" %}
 
 {% block head %}
 <style>
-  .lmu-account { flex-shrink: 0; border-top: 1px solid var(--border); padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .lmu-account { flex-shrink: 0; border-top: 1px solid var(--lv-border); padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; }
   .lmu-account form { margin: 0; }
-  .lmu-who { display: flex; align-items: center; gap: 10px; padding: 6px 10px; font-size: 13px; color: var(--muted); min-width: 0; }
+  .lmu-who { display: flex; align-items: center; gap: 10px; padding: 6px 10px; font-size: 13px; color: var(--lv-muted); min-width: 0; }
   .lmu-who span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .lmu-avatar { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; background: var(--accent-soft); color: var(--accent-text); font-weight: 700; font-size: 12px; }
-  .lmu-account .sidebar-nav-item { width: 100%; border: 0; background: none; font: inherit; font-size: 14px; cursor: pointer; text-align: left; text-decoration: none; }
+  .lmu-avatar { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; background: var(--lv-accent-soft); color: var(--lv-accent-text); font-weight: 700; font-size: 12px; }
+  /* Drawn like lovia's sidebar items (links in sidebar_nav get that for free). */
+  .lmu-signout {
+    width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 10px;
+    border: 0; border-radius: var(--lv-radius-sm); background: none; cursor: pointer;
+    font: inherit; font-size: 14px; font-weight: 500; color: var(--lv-ink-2); text-align: left;
+  }
+  .lmu-signout:hover { background: var(--lv-surface-3); color: var(--lv-ink); }
+  .lmu-signout svg { flex-shrink: 0; color: var(--lv-muted); }
+  .lmu-signout:hover svg { color: var(--lv-ink-2); }
   .lmu-readonly {
     position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 40;
     max-width: calc(100vw - 32px); padding: 8px 16px; border-radius: 999px; font-size: 13px;
-    background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn-border); box-shadow: var(--shadow-sm);
+    color: var(--lv-warn);
+    background: color-mix(in srgb, var(--lv-warn) 10%, var(--lv-surface));
+    border: 1px solid color-mix(in srgb, var(--lv-warn) 35%, transparent);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.08);
   }
   .lmu-readonly a { color: inherit; font-weight: 600; }
   {% if request.state.viewer.id != request.state.owner.id %}
   /* Read-only: an admin's writes are refused (403) anyway — don't offer them. */
-  #composer { display: none !important; }
+  [data-part="composer"] { display: none; }
   {% endif %}
 </style>
+{% endblock %}
+
+{% block sidebar_nav %}
+{% if request.state.viewer.admin %}
+<a href="/admin">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
+  <span>管理后台</span>
+</a>
+{% endif %}
 {% endblock %}
 
 {% block sidebar_footer %}
 {% set viewer = request.state.viewer %}
 <div class="lmu-account">
   <div class="lmu-who"><span class="lmu-avatar">{{ viewer.name[:1] | upper }}</span><span>{{ viewer.name }}</span></div>
-  {% if viewer.admin %}<a class="sidebar-nav-item" href="/admin">管理后台</a>{% endif %}
-  <form method="post" action="/logout"><button class="sidebar-nav-item" type="submit">退出登录</button></form>
+  <form method="post" action="/logout">
+    <button class="lmu-signout" type="submit">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/></svg>
+      <span>退出登录</span>
+    </button>
+  </form>
 </div>
 {% endblock %}
 
