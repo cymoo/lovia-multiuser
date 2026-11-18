@@ -19,7 +19,13 @@ def test_admin_views_are_recorded_with_their_outcome(env):
 def test_ui_refreshes_are_not_recorded(env):
     env.as_("alice").chat("alice", "hi")
     root = env.as_("root")
-    for path in ("/api/info", "/api/agents", "/api/sessions?limit=51", "/api/runs"):
+    for path in (
+        "/api/info",
+        "/api/agents",
+        "/api/sessions?limit=51",
+        "/api/runs",
+        "/api/schedules",
+    ):
         assert root.get(f"/u/alice{path}").status_code == 200
     assert entries(env) == []
 

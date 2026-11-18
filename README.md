@@ -260,6 +260,7 @@ uv run --extra dev ruff format --check .
 
 - [设计方案](docs/design.md)：选型、请求处理、权限模型、审计、停用、安全边界、已知限制
 - [使用指南](docs/guide.md)：编写 agent、替换认证、全部参数、数据导出与删除
+- [升级到 lovia 0.9.235](docs/upgrade-lovia-0.9.235.md)：从 0.9.128 升级时要改什么
 - [升级到 lovia 0.9.128](docs/upgrade-lovia-0.9.128.md)：从 0.9.114 升级时要改什么
 - [升级到 lovia 0.9.114](docs/upgrade-lovia-0.9.114.md)：从 0.9.112 升级时要改什么
 - [升级到 lovia 0.9.112](docs/upgrade-lovia-0.9.112.md)：从 0.9.96 升级时要改什么

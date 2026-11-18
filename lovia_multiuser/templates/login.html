@@ -39,14 +39,19 @@
   </form>
   {% if bye %}
   <script>
-    // The chat UI keeps unsent drafts in localStorage, one origin for every
-    // user: drop them on sign-out so the next person on this browser doesn't
-    // see them. Preferences (theme, language) stay.
+    // The chat UI keeps one origin's storage for every user: unsent drafts and
+    // folded folder groups in localStorage, the open folder and file in this
+    // tab's sessionStorage. Drop them on sign-out so the next person on this
+    // browser doesn't see them. Preferences (theme, language) stay.
+    const USER_DATA = ['lovia-followups', 'lovia-runs-seen', 'lovia-workspace-collapsed'];
     try {
       for (const key of Object.keys(localStorage)) {
-        if (key.startsWith('lovia-draft:') || key === 'lovia-followups' || key === 'lovia-runs-seen') {
+        if (key.startsWith('lovia-draft:') || USER_DATA.includes(key)) {
           localStorage.removeItem(key);
         }
+      }
+      for (const key of Object.keys(sessionStorage)) {
+        if (key.startsWith('lovia-')) sessionStorage.removeItem(key);
       }
     } catch (e) { /* storage blocked: nothing to clear */ }
   </script>

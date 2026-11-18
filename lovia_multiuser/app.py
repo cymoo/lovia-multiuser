@@ -52,6 +52,7 @@ UI_REFRESH = frozenset(
         "/api/sessions",
         "/api/runs",
         "/api/runs/history",
+        "/api/schedules",
     }
 )
 # create_app() options this app owns for every tenant. ``lifespan`` too: Tenants

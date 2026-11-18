@@ -114,7 +114,7 @@ data/
 - `http`：进入他人空间的请求，含方法、路径、查询串和响应状态。包括管理员查看、被拒的写操作、越权访问（404）。
 - `user.disable` / `user.enable`：账号操作。
 
-不记录：本人在自己空间的请求、静态资源（`/static/` 和 `ChatUI.assets` 所在的 `/ui/`）、lovia UI 每次打开页面都会重复的后台刷新（`/api/info`、`/api/agents`、`/api/events`、`/api/sessions` 列表、`/api/runs`、`/api/runs/history`）成功的请求。不过滤的话，管理员打开一次页面约有 14 条记录，真正打开了哪个对话会被淹没。被拒绝的请求始终记录。
+不记录：本人在自己空间的请求、静态资源（`/static/` 和 `ChatUI.assets` 所在的 `/ui/`）、lovia UI 每次打开页面都会重复的后台刷新（`/api/info`、`/api/agents`、`/api/events`、`/api/sessions` 列表、`/api/runs`、`/api/runs/history`、`/api/schedules` 列表）成功的请求。不过滤的话，管理员打开一次页面约有 20 条记录，真正打开了哪个对话会被淹没。被拒绝的请求始终记录。
 
 查询：后台"审计"页（按操作者、对象用户筛选），或 `lovia-multiuser audit`。
 
@@ -157,7 +157,8 @@ data/
 - **开放重定向**：`next` 只接受本站路径。
 - **登录**：scrypt 哈希；用户不存在时也跑一次哈希，响应时间一致；密码错和用户不存在返回同一条提示。
 - **cookie**：`HttpOnly`；部署在 TLS 后面时传 `CookieAuth(..., secure=True)`；签名密钥文件权限 0600。
-- **同源 localStorage**：所有用户共用一个源，lovia UI 的草稿存在 localStorage。退出登录时清除草稿，保留主题、语言等偏好。
+- **同源浏览器存储**：所有用户共用一个源，lovia UI 的草稿、追问建议等存在 localStorage，文件面板和文件夹选择存在
+  sessionStorage（同一标签页里，下一个人登录后仍在）。退出登录时清除这些，保留主题、语言等偏好。
 
 ## 10. 已知限制与后续
 
